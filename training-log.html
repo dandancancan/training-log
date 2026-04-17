@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<title>Training Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-2: #1c1c1c;
+    --border: #2a2a2a;
+    --text: #f4f4f4;
+    --muted: #888;
+    --accent: #ff2e2e;
+    --accent-dim: #b52020;
+    --ok: #4ade80;
+    --warn: #fbbf24;
+    --display: 'Bungee', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+    --body: 'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    min-height: 100vh;
+    padding: 20px;
+    background-image:
+      radial-gradient(circle at 20% 0%, rgba(255, 46, 46, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 80% 100%, rgba(255, 46, 46, 0.04) 0%, transparent 50%);
+  }
+
+  .app {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 20px 0 30px;
+    border-bottom: 2px solid var(--border);
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .brand h1 {
+    font-family: var(--display);
+    font-size: clamp(32px, 5vw, 48px);
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .brand h1 .accent { color: var(--accent); }
+  .brand p {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 6px;
+  }
+  .date-box {
+    font-family: var(--mono);
+    text-align: right;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .date-box .day {
+    font-family: var(--display);
+    font-size: 28px;
+    color: var(--text);
+    display: block;
+    line-height: 1;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 10px 18px;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .tab:hover { color: var(--text); border-color: var(--muted); }
+  .tab.active {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+  }
+
+  /* Panels */
+  .panel {
+    display: none;
+    animation: slideIn 0.25s ease;
+  }
+  .panel.active { display: block; }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .card-title {
+    font-family: var(--display);
+    font-size: 18px;
+    letter-spacing: 0;
+  }
+  .card-subtitle {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 4px;
+  }
+
+  /* Form fields */
+  .field {
+    margin-bottom: 16px;
+  }
+  .field-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 6px;
+  }
+  input, select, textarea {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 12px;
+    font-family: var(--mono);
+    font-size: 14px;
+    transition: border-color 0.15s;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  textarea { resize: vertical; min-height: 60px; font-family: var(--body); }
+
+  /* Buttons */
+  button.btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    padding: 12px 20px;
+    font-family: var(--display);
+    font-size: 13px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  button.btn:hover { background: #fff; }
+  button.btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  button.btn-ghost:hover { border-color: var(--accent); color: var(--accent); background: transparent; }
+  button.btn-sm {
+    padding: 6px 12px;
+    font-size: 10px;
+    font-family: var(--mono);
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  button.btn-danger {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  button.btn-danger:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* Exercise rows */
+  .exercise-block {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .exercise-head {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .exercise-head input[type="text"] {
+    flex: 1;
+    font-weight: 600;
+  }
+  .sets-grid {
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr 60px 40px;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .sets-grid.header-row {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .sets-grid input {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+  .set-num {
+    text-align: center;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .remove-set, .remove-ex {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px;
+  }
+  .remove-set:hover, .remove-ex:hover { color: var(--accent); }
+
+  /* History */
+  .history-item {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    padding: 16px;
+    margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    align-items: center;
+    transition: border-color 0.15s;
+  }
+  .history-item:hover { border-color: var(--accent); }
+  .history-date {
+    font-family: var(--display);
+    font-size: 20px;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .history-date small {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+  .history-meta {
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  .history-meta .type {
+    display: inline-block;
+    background: var(--accent);
+    color: #000;
+    padding: 2px 8px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .history-meta .summary {
+    color: var(--muted);
+    font-size: 11px;
+  }
+
+  /* Stats */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .stat {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    padding: 16px;
+    border-left: 3px solid var(--accent);
+  }
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .stat-value {
+    font-family: var(--display);
+    font-size: 32px;
+    color: var(--text);
+    line-height: 1.1;
+    margin-top: 4px;
+  }
+  .stat-unit {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+
+  /* Empty state */
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--accent);
+    color: #000;
+    padding: 12px 24px;
+    font-family: var(--display);
+    font-size: 12px;
+    letter-spacing: 1px;
+    transition: transform 0.25s ease;
+    z-index: 100;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Export modal */
+  .modal-bg {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 50;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-bg.show { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    max-width: 700px;
+    width: 100%;
+    max-height: 90vh;
+    overflow: auto;
+    padding: 24px;
+  }
+  .modal pre {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text);
+    overflow-x: auto;
+    white-space: pre-wrap;
+    margin: 16px 0;
+  }
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  /* Entry details */
+  .entry-details {
+    display: none;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  .entry-details.show { display: block; }
+  .entry-details pre {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    white-space: pre-wrap;
+  }
+
+  /* Biometrics table */
+  .bio-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  .bio-table th, .bio-table td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .bio-table th {
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 10px;
+    font-weight: 500;
+  }
+  .bio-table td { color: var(--text); }
+  .bio-table tr:hover td { background: var(--surface-2); }
+
+  /* Responsive */
+  @media (max-width: 640px) {
+    body { padding: 12px; }
+    .card { padding: 16px; }
+    header { padding-bottom: 20px; margin-bottom: 20px; }
+    .sets-grid {
+      grid-template-columns: 30px 1fr 1fr 50px 30px;
+      gap: 6px;
+    }
+    .history-item {
+      grid-template-columns: auto 1fr;
+    }
+    .history-item .btn-ghost { grid-column: 1 / -1; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <h1>TRAINING<span class="accent">.</span>LOG</h1>
+      <p>Recomp Protocol // Phase Active</p>
+    </div>
+    <div class="date-box">
+      <span id="dayNum" class="day">--</span>
+      <span id="monthYear">------ ----</span>
+    </div>
+  </header>
+
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-panel="log-lift">+ Lift</button>
+    <button class="tab" data-panel="log-run">+ Run</button>
+    <button class="tab" data-panel="log-bio">+ Biometrics</button>
+    <button class="tab" data-panel="history">History</button>
+    <button class="tab" data-panel="stats">Stats</button>
+    <button class="tab" data-panel="export">Export</button>
+  </div>
+
+  <!-- LOG LIFT -->
+  <div class="panel active" id="log-lift">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">LOG LIFTING SESSION</div>
+          <div class="card-subtitle">Push // Pull // Legs // Upper</div>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div>
+          <label>Date</label>
+          <input type="date" id="lift-date">
+        </div>
+        <div>
+          <label>Session Type</label>
+          <select id="lift-type">
+            <option value="Push">Push</option>
+            <option value="Pull">Pull</option>
+            <option value="Legs">Legs</option>
+            <option value="Upper">Upper</option>
+          </select>
+        </div>
+        <div>
+          <label>Duration (min)</label>
+          <input type="number" id="lift-duration" placeholder="60">
+        </div>
+        <div>
+          <label>Bodyweight (kg)</label>
+          <input type="number" step="0.1" id="lift-bw" placeholder="82.0">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div>
+          <label>Energy (1–10)</label>
+          <input type="number" min="1" max="10" id="lift-energy" placeholder="7">
+        </div>
+        <div>
+          <label>Sleep last night (hrs)</label>
+          <input type="number" step="0.1" id="lift-sleep" placeholder="7.5">
+        </div>
+        <div>
+          <label>Overall Rating (1–10)</label>
+          <input type="number" min="1" max="10" id="lift-rating" placeholder="8">
+        </div>
+        <div>
+          <label>vs Last Session</label>
+          <select id="lift-progress">
+            <option value="better">Better</option>
+            <option value="same">Same</option>
+            <option value="worse">Worse</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Session Notes</label>
+        <textarea id="lift-notes" placeholder="How did it feel? Anything to flag?"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">EXERCISES</div>
+          <div class="card-subtitle">Weight × Reps per set</div>
+        </div>
+        <button class="btn btn-sm" id="add-exercise">+ Add Exercise</button>
+      </div>
+      <div id="exercise-list"></div>
+    </div>
+
+    <button class="btn" id="save-lift" style="width: 100%; padding: 16px;">SAVE SESSION</button>
+  </div>
+
+  <!-- LOG RUN -->
+  <div class="panel" id="log-run">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">LOG RUN</div>
+          <div class="card-subtitle">Zone 2 // Tempo // VO2 // Long</div>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div>
+          <label>Date</label>
+          <input type="date" id="run-date">
+        </div>
+        <div>
+          <label>Type</label>
+          <select id="run-type">
+            <option value="Z2">Zone 2</option>
+            <option value="Tempo">Tempo</option>
+            <option value="VO2">VO2 Max</option>
+            <option value="Long">Long</option>
+          </select>
+        </div>
+        <div>
+          <label>Distance (km)</label>
+          <input type="number" step="0.01" id="run-distance" placeholder="5.00">
+        </div>
+        <div>
+          <label>Duration (min:sec)</label>
+          <input type="text" id="run-duration" placeholder="38:15">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div>
+          <label>Avg Pace (min:sec/km)</label>
+          <input type="text" id="run-pace" placeholder="7:30">
+        </div>
+        <div>
+          <label>Avg HR (bpm)</label>
+          <input type="number" id="run-avghr" placeholder="145">
+        </div>
+        <div>
+          <label>Max HR (bpm)</label>
+          <input type="number" id="run-maxhr" placeholder="160">
+        </div>
+        <div>
+          <label>Conditions</label>
+          <input type="text" id="run-conditions" placeholder="18°C, light wind">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div>
+          <label>Pre-Run Energy (1–10)</label>
+          <input type="number" min="1" max="10" id="run-pre" placeholder="7">
+        </div>
+        <div>
+          <label>Post-Run Energy (1–10)</label>
+          <input type="number" min="1" max="10" id="run-post" placeholder="6">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Structure (warm-up, main set, cool-down)</label>
+        <textarea id="run-structure" placeholder="10 min easy / 4×4min tempo w/ 3min jog / 10 min easy"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Notes</label>
+        <textarea id="run-notes" placeholder="How did it feel? Anything unusual?"></textarea>
+      </div>
+    </div>
+
+    <button class="btn" id="save-run" style="width: 100%; padding: 16px;">SAVE RUN</button>
+  </div>
+
+  <!-- LOG BIOMETRICS -->
+  <div class="panel" id="log-bio">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">BIOMETRICS</div>
+          <div class="card-subtitle">Daily or weekly measurements</div>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div>
+          <label>Date</label>
+          <input type="date" id="bio-date">
+        </div>
+        <div>
+          <label>Weight (kg)</label>
+          <input type="number" step="0.1" id="bio-weight" placeholder="82.0">
+        </div>
+        <div>
+          <label>Body Fat (%)</label>
+          <input type="number" step="0.1" id="bio-bf" placeholder="15.0">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div>
+          <label>Waist (cm)</label>
+          <input type="number" step="0.1" id="bio-waist">
+        </div>
+        <div>
+          <label>Chest (cm)</label>
+          <input type="number" step="0.1" id="bio-chest">
+        </div>
+        <div>
+          <label>Arm (cm)</label>
+          <input type="number" step="0.1" id="bio-arm">
+        </div>
+        <div>
+          <label>Thigh (cm)</label>
+          <input type="number" step="0.1" id="bio-thigh">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div>
+          <label>Sleep (hrs)</label>
+          <input type="number" step="0.1" id="bio-sleep">
+        </div>
+        <div>
+          <label>Sleep Quality (1–10)</label>
+          <input type="number" min="1" max="10" id="bio-sleepq">
+        </div>
+        <div>
+          <label>Resting HR</label>
+          <input type="number" id="bio-rhr">
+        </div>
+        <div>
+          <label>Soreness (1–10)</label>
+          <input type="number" min="1" max="10" id="bio-soreness">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Notes</label>
+        <textarea id="bio-notes" placeholder="Stress, mood, anything relevant"></textarea>
+      </div>
+    </div>
+
+    <button class="btn" id="save-bio" style="width: 100%; padding: 16px;">SAVE ENTRY</button>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="panel" id="history">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">SESSION HISTORY</div>
+          <div class="card-subtitle">All logged sessions</div>
+        </div>
+        <select id="history-filter" style="max-width: 180px;">
+          <option value="all">All Sessions</option>
+          <option value="lift">Lifting Only</option>
+          <option value="run">Running Only</option>
+          <option value="bio">Biometrics Only</option>
+        </select>
+      </div>
+      <div id="history-list"></div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="panel" id="stats">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">QUICK STATS</div>
+          <div class="card-subtitle">Last 30 days</div>
+        </div>
+      </div>
+      <div class="stat-grid" id="stat-grid"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">BIOMETRICS LOG</div>
+          <div class="card-subtitle">Recent entries</div>
+        </div>
+      </div>
+      <div id="bio-history"></div>
+    </div>
+  </div>
+
+  <!-- EXPORT -->
+  <div class="panel" id="export">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">EXPORT TO CLAUDE CODE</div>
+          <div class="card-subtitle">Send data to your fitness-tracker folder</div>
+        </div>
+      </div>
+      <p style="color: var(--muted); font-size: 14px; margin-bottom: 20px; line-height: 1.6;">
+        Exports all your data as files in the Claude Code format. Download the zip, unzip into your <code style="color: var(--accent); font-family: var(--mono);">fitness-tracker/</code> folder (replacing existing files), and your trainer will read the new data.
+      </p>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="btn" id="export-all">Download All as ZIP</button>
+        <button class="btn btn-ghost" id="export-json">Export Raw JSON (backup)</button>
+        <button class="btn btn-ghost" id="import-json">Import JSON Backup</button>
+        <input type="file" id="import-file" accept=".json" style="display: none;">
+      </div>
+      <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
+        <p style="color: var(--muted); font-size: 12px; font-family: var(--mono); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px;">Danger Zone</p>
+        <button class="btn btn-danger" id="clear-all">Clear All Data</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal">
+    <div class="card-title" style="margin-bottom: 8px;">FILE PREVIEW</div>
+    <div class="card-subtitle" id="modal-filename">filename.md</div>
+    <pre id="modal-content"></pre>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="modal-copy">Copy to Clipboard</button>
+      <button class="btn" id="modal-close">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Saved</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+// ===== Data layer =====
+const STORE = 'dan_training_log_v1';
+const load = () => {
+  try {
+    return JSON.parse(localStorage.getItem(STORE)) || { lifts: [], runs: [], bio: [] };
+  } catch { return { lifts: [], runs: [], bio: [] }; }
+};
+const save = (data) => localStorage.setItem(STORE, JSON.stringify(data));
+let db = load();
+
+// ===== Utility =====
+const $ = (id) => document.getElementById(id);
+const todayISO = () => new Date().toISOString().slice(0, 10);
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+const toast = (msg) => {
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+};
+
+// ===== Header date =====
+const setHeaderDate = () => {
+  const d = new Date();
+  $('dayNum').textContent = String(d.getDate()).padStart(2, '0');
+  const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  $('monthYear').textContent = `${months[d.getMonth()]} ${d.getFullYear()}`;
+};
+setHeaderDate();
+
+// ===== Tab switching =====
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    $(btn.dataset.panel).classList.add('active');
+    if (btn.dataset.panel === 'history') renderHistory();
+    if (btn.dataset.panel === 'stats') renderStats();
+  });
+});
+
+// ===== Pre-fill dates =====
+$('lift-date').value = todayISO();
+$('run-date').value = todayISO();
+$('bio-date').value = todayISO();
+
+// ===== Lifting form =====
+const addExerciseRow = (data = {}) => {
+  const id = uid();
+  const div = document.createElement('div');
+  div.className = 'exercise-block';
+  div.dataset.id = id;
+  div.innerHTML = `
+    <div class="exercise-head">
+      <input type="text" class="ex-name" placeholder="Exercise name (e.g., Bench Press)" value="${data.name || ''}">
+      <input type="number" class="ex-rir" placeholder="RIR" style="width: 80px;" value="${data.rir ?? ''}">
+      <button class="remove-ex" title="Remove exercise">×</button>
+    </div>
+    <div class="sets-grid header-row">
+      <div>Set</div>
+      <div>Weight (kg)</div>
+      <div>Reps</div>
+      <div>BW?</div>
+      <div></div>
+    </div>
+    <div class="sets-container"></div>
+    <button class="btn btn-sm btn-ghost add-set" style="margin-top: 8px;">+ Set</button>
+    <div style="margin-top: 10px;">
+      <input type="text" class="ex-notes" placeholder="Notes for this exercise (optional)" value="${data.notes || ''}">
+    </div>
+  `;
+  $('exercise-list').appendChild(div);
+
+  const setsContainer = div.querySelector('.sets-container');
+  const addSet = (set = {}) => {
+    const setDiv = document.createElement('div');
+    setDiv.className = 'sets-grid';
+    setDiv.innerHTML = `
+      <div class="set-num">${setsContainer.children.length + 1}</div>
+      <input type="number" step="0.5" class="set-weight" placeholder="0" value="${set.weight ?? ''}">
+      <input type="number" class="set-reps" placeholder="0" value="${set.reps ?? ''}">
+      <input type="checkbox" class="set-bw" ${set.bw ? 'checked' : ''} style="width: auto; margin: 0 auto; display: block;">
+      <button class="remove-set" title="Remove set">×</button>
+    `;
+    setsContainer.appendChild(setDiv);
+    setDiv.querySelector('.remove-set').addEventListener('click', () => {
+      setDiv.remove();
+      renumberSets(setsContainer);
+    });
+  };
+
+  if (data.sets && data.sets.length) {
+    data.sets.forEach(s => addSet(s));
+  } else {
+    addSet(); addSet(); addSet();
+  }
+
+  div.querySelector('.add-set').addEventListener('click', () => addSet());
+  div.querySelector('.remove-ex').addEventListener('click', () => {
+    if (confirm('Remove this exercise?')) div.remove();
+  });
+};
+
+const renumberSets = (container) => {
+  [...container.children].forEach((row, i) => {
+    row.querySelector('.set-num').textContent = i + 1;
+  });
+};
+
+$('add-exercise').addEventListener('click', () => addExerciseRow());
+
+// Start with one exercise on load
+addExerciseRow();
+
+$('save-lift').addEventListener('click', () => {
+  const exercises = [];
+  document.querySelectorAll('#exercise-list .exercise-block').forEach(block => {
+    const name = block.querySelector('.ex-name').value.trim();
+    if (!name) return;
+    const sets = [];
+    block.querySelectorAll('.sets-container .sets-grid').forEach(row => {
+      const weight = parseFloat(row.querySelector('.set-weight').value);
+      const reps = parseInt(row.querySelector('.set-reps').value);
+      const bw = row.querySelector('.set-bw').checked;
+      if (!isNaN(reps) && reps > 0) {
+        sets.push({ weight: isNaN(weight) ? 0 : weight, reps, bw });
+      }
+    });
+    if (sets.length === 0) return;
+    exercises.push({
+      name,
+      sets,
+      rir: block.querySelector('.ex-rir').value,
+      notes: block.querySelector('.ex-notes').value.trim()
+    });
+  });
+
+  if (exercises.length === 0) {
+    alert('Add at least one exercise with completed sets.');
+    return;
+  }
+
+  const entry = {
+    id: uid(),
+    type: 'lift',
+    date: $('lift-date').value,
+    sessionType: $('lift-type').value,
+    duration: $('lift-duration').value,
+    bodyweight: $('lift-bw').value,
+    energy: $('lift-energy').value,
+    sleep: $('lift-sleep').value,
+    rating: $('lift-rating').value,
+    progress: $('lift-progress').value,
+    notes: $('lift-notes').value.trim(),
+    exercises
+  };
+  db.lifts.push(entry);
+  save(db);
+  toast('LIFT SAVED');
+
+  // Clear form
+  $('exercise-list').innerHTML = '';
+  addExerciseRow();
+  ['lift-duration','lift-bw','lift-energy','lift-sleep','lift-rating','lift-notes'].forEach(id => $(id).value = '');
+});
+
+// ===== Running form =====
+$('save-run').addEventListener('click', () => {
+  const entry = {
+    id: uid(),
+    type: 'run',
+    date: $('run-date').value,
+    runType: $('run-type').value,
+    distance: $('run-distance').value,
+    duration: $('run-duration').value,
+    pace: $('run-pace').value,
+    avgHR: $('run-avghr').value,
+    maxHR: $('run-maxhr').value,
+    conditions: $('run-conditions').value.trim(),
+    preEnergy: $('run-pre').value,
+    postEnergy: $('run-post').value,
+    structure: $('run-structure').value.trim(),
+    notes: $('run-notes').value.trim()
+  };
+  if (!entry.distance && !entry.duration) {
+    alert('Enter at least distance or duration.');
+    return;
+  }
+  db.runs.push(entry);
+  save(db);
+  toast('RUN SAVED');
+  ['run-distance','run-duration','run-pace','run-avghr','run-maxhr','run-conditions','run-pre','run-post','run-structure','run-notes'].forEach(id => $(id).value = '');
+});
+
+// ===== Biometrics form =====
+$('save-bio').addEventListener('click', () => {
+  const entry = {
+    id: uid(),
+    type: 'bio',
+    date: $('bio-date').value,
+    weight: $('bio-weight').value,
+    bf: $('bio-bf').value,
+    waist: $('bio-waist').value,
+    chest: $('bio-chest').value,
+    arm: $('bio-arm').value,
+    thigh: $('bio-thigh').value,
+    sleep: $('bio-sleep').value,
+    sleepQuality: $('bio-sleepq').value,
+    rhr: $('bio-rhr').value,
+    soreness: $('bio-soreness').value,
+    notes: $('bio-notes').value.trim()
+  };
+  const hasData = entry.weight || entry.bf || entry.waist || entry.sleep || entry.rhr;
+  if (!hasData) {
+    alert('Enter at least one measurement.');
+    return;
+  }
+  db.bio.push(entry);
+  save(db);
+  toast('ENTRY SAVED');
+  ['bio-weight','bio-bf','bio-waist','bio-chest','bio-arm','bio-thigh','bio-sleep','bio-sleepq','bio-rhr','bio-soreness','bio-notes'].forEach(id => $(id).value = '');
+});
+
+// ===== History =====
+const formatDateShort = (iso) => {
+  if (!iso) return '--';
+  const d = new Date(iso);
+  return String(d.getDate()).padStart(2, '0');
+};
+const formatDateSub = (iso) => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  return `${months[d.getMonth()]} ${d.getFullYear()}`;
+};
+
+const renderHistory = () => {
+  const filter = $('history-filter').value;
+  const all = [
+    ...db.lifts.map(l => ({ ...l, _kind: 'lift' })),
+    ...db.runs.map(r => ({ ...r, _kind: 'run' })),
+    ...db.bio.map(b => ({ ...b, _kind: 'bio' }))
+  ].filter(x => filter === 'all' || x._kind === filter)
+   .sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+  if (all.length === 0) {
+    $('history-list').innerHTML = '<div class="empty">No entries yet — start logging</div>';
+    return;
+  }
+
+  $('history-list').innerHTML = all.map(e => {
+    let label = '', summary = '';
+    if (e._kind === 'lift') {
+      label = e.sessionType || 'LIFT';
+      const setCount = (e.exercises || []).reduce((sum, ex) => sum + (ex.sets || []).length, 0);
+      summary = `${(e.exercises || []).length} exercises · ${setCount} sets · rating ${e.rating || '—'}/10`;
+    } else if (e._kind === 'run') {
+      label = e.runType || 'RUN';
+      summary = `${e.distance || '—'}km · ${e.duration || '—'} · avg ${e.pace || '—'}/km`;
+    } else {
+      label = 'BIO';
+      const parts = [];
+      if (e.weight) parts.push(`${e.weight}kg`);
+      if (e.bf) parts.push(`${e.bf}% BF`);
+      if (e.sleep) parts.push(`${e.sleep}h sleep`);
+      summary = parts.join(' · ') || 'measurements';
+    }
+    return `
+      <div class="history-item" data-id="${e.id}" data-kind="${e._kind}">
+        <div class="history-date">
+          ${formatDateShort(e.date)}
+          <small>${formatDateSub(e.date)}</small>
+        </div>
+        <div class="history-meta">
+          <span class="type">${label}</span>
+          <div class="summary">${summary}</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="deleteEntry('${e._kind}', '${e.id}')">Delete</button>
+      </div>
+    `;
+  }).join('');
+};
+
+window.deleteEntry = (kind, id) => {
+  if (!confirm('Delete this entry? Cannot be undone.')) return;
+  const key = kind === 'lift' ? 'lifts' : kind === 'run' ? 'runs' : 'bio';
+  db[key] = db[key].filter(e => e.id !== id);
+  save(db);
+  renderHistory();
+  toast('DELETED');
+};
+
+$('history-filter').addEventListener('change', renderHistory);
+
+// ===== Stats =====
+const renderStats = () => {
+  const thirty = new Date();
+  thirty.setDate(thirty.getDate() - 30);
+  const cutoff = thirty.toISOString().slice(0, 10);
+
+  const recentLifts = db.lifts.filter(l => l.date >= cutoff);
+  const recentRuns = db.runs.filter(r => r.date >= cutoff);
+  const recentBio = db.bio.filter(b => b.date >= cutoff);
+
+  const totalKm = recentRuns.reduce((s, r) => s + (parseFloat(r.distance) || 0), 0);
+  const totalSets = recentLifts.reduce((s, l) => s + (l.exercises || []).reduce((ss, ex) => ss + (ex.sets || []).length, 0), 0);
+
+  const weights = recentBio.filter(b => b.weight).map(b => parseFloat(b.weight));
+  const latestWeight = weights[weights.length - 1];
+  const firstWeight = weights[0];
+  const weightChange = (latestWeight && firstWeight) ? (latestWeight - firstWeight).toFixed(1) : null;
+
+  $('stat-grid').innerHTML = `
+    <div class="stat">
+      <div class="stat-label">Lift Sessions</div>
+      <div class="stat-value">${recentLifts.length}</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Total Sets</div>
+      <div class="stat-value">${totalSets}</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Runs</div>
+      <div class="stat-value">${recentRuns.length}</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Total Distance</div>
+      <div class="stat-value">${totalKm.toFixed(1)}<span class="stat-unit">km</span></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Current Weight</div>
+      <div class="stat-value">${latestWeight ? latestWeight : '—'}${latestWeight ? '<span class="stat-unit">kg</span>' : ''}</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">30-Day Change</div>
+      <div class="stat-value">${weightChange !== null ? (weightChange > 0 ? '+' : '') + weightChange : '—'}${weightChange !== null ? '<span class="stat-unit">kg</span>' : ''}</div>
+    </div>
+  `;
+
+  // Biometrics table
+  const sortedBio = [...db.bio].sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 10);
+  if (sortedBio.length === 0) {
+    $('bio-history').innerHTML = '<div class="empty">No biometrics logged yet</div>';
+  } else {
+    $('bio-history').innerHTML = `
+      <table class="bio-table">
+        <thead>
+          <tr>
+            <th>Date</th><th>Weight</th><th>BF%</th><th>Waist</th><th>Sleep</th><th>RHR</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${sortedBio.map(b => `
+            <tr>
+              <td>${b.date || '—'}</td>
+              <td>${b.weight || '—'}</td>
+              <td>${b.bf || '—'}</td>
+              <td>${b.waist || '—'}</td>
+              <td>${b.sleep || '—'}</td>
+              <td>${b.rhr || '—'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+  }
+};
+
+// ===== Export to Claude Code format =====
+const liftToMarkdown = (l) => {
+  const dateFmt = l.date || 'YYYY-MM-DD';
+  let md = `# ${dateFmt} — ${l.sessionType || 'Session'}\n\n`;
+  md += `**Duration:** ${l.duration || '—'} min\n`;
+  md += `**Bodyweight:** ${l.bodyweight || '—'} kg\n`;
+  md += `**Energy (1-10):** ${l.energy || '—'}\n`;
+  md += `**Sleep last night:** ${l.sleep || '—'} hrs\n`;
+  md += `**Notes:** ${l.notes || '—'}\n\n---\n\n## Lifts\n\n`;
+  md += `| Exercise | Set 1 | Set 2 | Set 3 | Set 4 | Set 5 | RIR | Notes |\n`;
+  md += `|---|---|---|---|---|---|---|---|\n`;
+  (l.exercises || []).forEach(ex => {
+    const sets = (ex.sets || []).map(s => {
+      if (s.bw) return s.weight ? `BW+${s.weight}x${s.reps}` : `BWx${s.reps}`;
+      return `${s.weight}x${s.reps}`;
+    });
+    while (sets.length < 5) sets.push('');
+    md += `| ${ex.name} | ${sets.slice(0,5).join(' | ')} | ${ex.rir || '—'} | ${ex.notes || ''} |\n`;
+  });
+  md += `\n---\n\n## Session rating\n\n`;
+  md += `- **Overall (1-10):** ${l.rating || '—'}\n`;
+  md += `- **Progress vs last session:** ${l.progress || '—'}\n`;
+  return md;
+};
+
+const runToMarkdown = (r) => {
+  const dateFmt = r.date || 'YYYY-MM-DD';
+  let md = `# ${dateFmt} — ${r.runType || 'Run'}\n\n`;
+  md += `**Distance:** ${r.distance || '—'} km\n`;
+  md += `**Duration:** ${r.duration || '—'}\n`;
+  md += `**Avg pace:** ${r.pace || '—'}/km\n`;
+  md += `**Avg HR:** ${r.avgHR || '—'} bpm\n`;
+  md += `**Max HR:** ${r.maxHR || '—'} bpm\n`;
+  md += `**Conditions:** ${r.conditions || '—'}\n`;
+  md += `**Energy pre-run (1-10):** ${r.preEnergy || '—'}\n`;
+  md += `**Energy post-run (1-10):** ${r.postEnergy || '—'}\n\n---\n\n`;
+  md += `## Session structure\n\n${r.structure || '—'}\n\n---\n\n## Notes\n\n${r.notes || '—'}\n`;
+  return md;
+};
+
+const bioToCSV = () => {
+  let csv = 'date,weight_kg,body_fat_pct,waist_cm,chest_cm,arm_cm,thigh_cm,notes\n';
+  const sorted = [...db.bio].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+  sorted.forEach(b => {
+    const safeNotes = (b.notes || '').replace(/,/g, ';').replace(/\n/g, ' ');
+    csv += `${b.date || ''},${b.weight || ''},${b.bf || ''},${b.waist || ''},${b.chest || ''},${b.arm || ''},${b.thigh || ''},${safeNotes}\n`;
+  });
+  return csv;
+};
+
+const recoveryToCSV = () => {
+  let csv = 'date,sleep_hours,sleep_quality_1_10,resting_hr,hrv_ms,soreness_1_10,stress_1_10,notes\n';
+  const sorted = [...db.bio].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+  sorted.forEach(b => {
+    const safeNotes = (b.notes || '').replace(/,/g, ';').replace(/\n/g, ' ');
+    csv += `${b.date || ''},${b.sleep || ''},${b.sleepQuality || ''},${b.rhr || ''},,${b.soreness || ''},,${safeNotes}\n`;
+  });
+  return csv;
+};
+
+const slugify = (s) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+$('export-all').addEventListener('click', async () => {
+  const zip = new JSZip();
+  const workouts = zip.folder('workouts');
+  const running = zip.folder('running');
+  const biometrics = zip.folder('biometrics');
+  const recovery = zip.folder('recovery');
+
+  db.lifts.forEach(l => {
+    const fname = `${l.date || 'undated'}-${slugify(l.sessionType)}.md`;
+    workouts.file(fname, liftToMarkdown(l));
+  });
+  db.runs.forEach(r => {
+    const fname = `${r.date || 'undated'}-${slugify(r.runType)}.md`;
+    running.file(fname, runToMarkdown(r));
+  });
+  biometrics.file('weight.csv', bioToCSV());
+  recovery.file('sleep.csv', recoveryToCSV());
+
+  const blob = await zip.generateAsync({ type: 'blob' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `training-export-${todayISO()}.zip`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('EXPORTED');
+});
+
+$('export-json').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `training-backup-${todayISO()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('BACKUP DOWNLOADED');
+});
+
+$('import-json').addEventListener('click', () => $('import-file').click());
+$('import-file').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (!imported.lifts || !imported.runs || !imported.bio) throw new Error('Invalid backup format');
+      if (!confirm('Import will REPLACE all current data. Continue?')) return;
+      db = imported;
+      save(db);
+      toast('IMPORTED');
+      renderHistory();
+      renderStats();
+    } catch (err) {
+      alert('Could not import: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+});
+
+$('clear-all').addEventListener('click', () => {
+  if (!confirm('DELETE ALL DATA? This cannot be undone.')) return;
+  if (!confirm('Really sure? Export a backup first if you want to keep it.')) return;
+  db = { lifts: [], runs: [], bio: [] };
+  save(db);
+  toast('CLEARED');
+  renderHistory();
+  renderStats();
+});
+
+// Modal close
+$('modal-close').addEventListener('click', () => $('modal-bg').classList.remove('show'));
+$('modal-bg').addEventListener('click', (e) => {
+  if (e.target.id === 'modal-bg') $('modal-bg').classList.remove('show');
+});
+</script>
+</body>
+</html>
